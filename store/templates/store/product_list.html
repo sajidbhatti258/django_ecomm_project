@@ -1,0 +1,205 @@
+{% extends 'base.html' %} {% load static %} {% block main %}
+<br />
+<section id="billboard" class="position-relative overflow-hidden bg-light-blue">
+  <div class="swiper main-swiper">
+    <div class="swiper-wrapper">
+      {% for product in featured_products %}
+      <div class="swiper-slide">
+        <div class="container mt-5">
+          <div class="row d-flex align-items-center">
+            <!-- Image Section -->
+            <div class="col-md-5 order-md-2 mt-5 image-holder">
+              <a href="{% url 'store:product_detail' product.pk %}">
+                <img
+                  src="{{ product.image.url }}"
+                  alt="{{ product.name }}"
+                  class="img-fluid"
+                  style="width: 100%; height: 400px; object-fit: cover"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+            <!-- Product Info Section -->
+            <div class="col-md-6 order-md-1 banner-content text-center">
+              <h1 class="display-2 text-uppercase text-dark pb-1 product-info">
+                <a href="{% url 'store:product_detail' product.pk %}"
+                  >{{ product.name|truncatechars:20 }}</a
+                >
+              </h1>
+              <form
+                action="{% url 'cart:add_to_cart' product_id=product.id %}"
+                method="post"
+              >
+                {% csrf_token %}
+                <input
+                  type="hidden"
+                  name="quantity"
+                  id="product-quantity-value"
+                  value="1"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg mt-3 mx-auto product-info"
+                >
+                  Add to Cart
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
+</section>
+
+<!-- Additional CSS -->
+<style>
+  /* Center Button in Mobile View */
+  @media (max-width: 768px) {
+    #billboard .image-holder {
+      order: -1; /* Show image first */
+    }
+    #billboard .banner-content {
+      text-align: center;
+    }
+    #billboard .product-info {
+      text-align: center;
+    }
+    .product-info button {
+      display: inline-block;
+      width: 80%; /* Center button */
+    }
+  }
+</style>
+<!-- Swiper Configuration -->
+{% comment %}
+<script>
+  const swiper = new Swiper(".main-swiper", {
+    loop: true,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+  });
+</script>
+{% endcomment %}
+
+<hr />
+{% endblock %} {% block content %}
+<section
+  id="mobile-products"
+  class="product-store position-relative padding-large no-padding-top"
+>
+  <div class="container">
+    {% for category in categories %}
+    <div class="category-section border-bottom pb-1 mb-5 text-center">
+      <h2
+        class="display-8 text-dark text-uppercase font-weight-bold text-center mb-4 mt-2"
+        style="font-family: 'Arial', sans-serif"
+      >
+        Products in
+        <a href="{% url 'store:category_product_list' category.id %}">
+          <span class="category-name text-secondary">{{ category.name }}</span>
+        </a>
+      </h2>
+      <hr class="mx-auto mb-5" style="width: 35%; border-top: 2px solid #333" />
+
+      <div class="swiper product-swiper">
+        <div class="swiper-wrapper">
+          {% for product in category.products.all %}
+          <div class="swiper-slide col-md-3 col-sm-6 col-12 mt-4 mb-4">
+            <div class="product-card position-relative card shadow border-0" style="border: 1px solid gray; transition: transform 0.3s ease;">
+              <!-- Product Image -->
+              <div class="image-holder overflow-hidden">
+                <a href="{% url 'store:product_detail' product.pk %}">
+                  <img
+                    src="{{ product.image.url }}"
+                    alt="{{ product.name }}"
+                    class="img-fluid card-img-top"
+                    style="height: 250px; object-fit: cover; transition: transform 0.3s ease;"
+                    loading="lazy"
+                  />
+                </a>
+              </div>
+          
+              <!-- Add to Cart Button (Hidden on Default) -->
+              <div
+                class="cart-concern position-absolute d-flex justify-content-center w-100"
+                style="bottom: 10px; opacity: 0; transition: opacity 0.3s ease;"
+              >
+                <form
+                  action="{% url 'cart:add_to_cart' product_id=product.id %}"
+                  method="post"
+                >
+                  {% csrf_token %}
+                  <input
+                    type="hidden"
+                    name="quantity"
+                    id="product-quantity-value"
+                    value="1"
+                  />
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm text-white px-4"
+                  >
+                    Add to Cart
+                  </button>
+                </form>
+              </div>
+          
+              <!-- Product Details -->
+              <div class="card-body text-center">
+                <h3 class="card-title text-uppercase h6">
+                  <a href="{% url 'store:product_detail' product.pk %}" class="text-dark text-decoration-none">
+                    {{ product.name|truncatechars:16 }}
+                  </a>
+                </h3>
+                <span class="item-price text-primary font-weight-bold">${{ product.price }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Inline CSS for Hover Effect -->
+          <style>
+            .product-card:hover {
+              background-color: #e9f7ff; /* Light background on hover */
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+              transform: scale(1.05); /* Slightly enlarge the card */
+            }
+          
+            .product-card:hover .cart-concern {
+              opacity: 1; /* Show the "Add to Cart" button on hover */
+            }
+          </style>
+          
+          
+          <!-- Add Hover Effect -->
+          <style>
+            .product-card:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            }
+          </style>
+          
+          
+          {% endfor %}
+        </div>
+        <div class="swiper-pagination position-relative text-center mt-5"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
